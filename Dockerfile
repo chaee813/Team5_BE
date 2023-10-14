@@ -15,4 +15,6 @@ RUN ./gradlew build
 
 ENV DATABASE_URL=jdbc:mariadb://mariadb/krampoline
 
+COPY ./build/libs/sunsu-wedding-1.0.jar /build/libs/sunsu-wedding-1.0.jar
+
 CMD ["java", "-jar", "-Dspring.profiles.active=prod", "/home/gradle/project/build/libs/sunsu-wedding-1.0.jar"]
