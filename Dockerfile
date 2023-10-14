@@ -13,8 +13,6 @@ RUN gradle wrapper
 
 RUN ./gradlew build
 
-WORKDIR /home/gradle/project
-
 COPY --from=build /home/gradle/project/build/libs/sunsu-wedding-1.0.jar .
 
 ENV DATABASE_URL=jdbc:mariadb://mariadb/krampoline
