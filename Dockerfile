@@ -9,7 +9,7 @@ RUN echo "systemProp.http.proxyHost=krmp-proxy.9rum.cc\nsystemProp.http.proxyPor
 
 RUN gradle init
 
-RUN gradle wraaper
+RUN ./gradlew wraaper
 
 RUN ./gradlew build
 
