@@ -11,7 +11,7 @@ RUN gradle init
 
 RUN gradle wrapper
 
-RUN ./gradlew build
+RUN ./gradlew clean build
 
 ENV DATABASE_URL=jdbc:mariadb://mariadb/krampoline
 
