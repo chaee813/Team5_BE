@@ -1,7 +1,7 @@
 # Stage 1: Build the application
 FROM krmp-d2hub-idock.9rum.cc/goorm/gradle:7.3.1-jdk17
 
-WORKDIR home/gradle/project
+WORKDIR project
 
 COPY /sunsu-wedding .
 
@@ -11,4 +11,4 @@ RUN ./gradlew clean build
 
 ENV DATABASE_URL=jdbc:mariadb://mariadb/krampoline
 
-CMD ["java", "-jar", "-Dspring.profiles.active=prod", "home/gradle/project/build/libs/sunsu-wedding-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "-Dspring.profiles.active=prod", "/home/gradle/project/build/libs/sunsu-wedding-0.0.1-SNAPSHOT.jar"]
