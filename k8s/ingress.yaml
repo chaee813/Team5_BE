@@ -14,4 +14,4 @@ spec:
           - backend:
               serviceName: backend
               servicePort: 8080
-              path: /k9789f63bf184a(/|$)(.*)
+              path: /(/|$)(.*)
