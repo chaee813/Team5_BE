@@ -13,5 +13,5 @@ spec:
         paths:
           - backend:
               serviceName: backend
-              servicePort: 80
+              servicePort: 8080
               path: /(/|$)(.*)
