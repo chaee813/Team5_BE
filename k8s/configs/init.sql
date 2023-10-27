@@ -15,19 +15,19 @@ CREATE TABLE `sample_data` (
 
 INSERT INTO sample_data (`id`,`detail`) VALUES ('1', 'Hello DKOS!');
 
-CREATE TABLE user_tb
+CREATE TABLE `user_tb`
 (
-    id         BIGINT AUTO_INCREMENT NOT NULL,
-    dtype      VARCHAR(31)           NULL,
-    email      VARCHAR(100)          NOT NULL,
-    password   VARCHAR(256)          NOT NULL,
-    username   VARCHAR(45)           NOT NULL,
-    grade      VARCHAR(255)          NOT NULL,
-    upgrade_at datetime              NULL,
-    is_active  BIT(1)                NULL,
-    created_at datetime              NOT NULL,
-    CONSTRAINT pk_user_tb PRIMARY KEY (id)
+    `id`         BIGINT AUTO_INCREMENT NOT NULL,
+    `dtype`      VARCHAR(31)           NULL,
+    `email`      VARCHAR(100)          NOT NULL,
+    `password`   VARCHAR(256)          NOT NULL,
+    `username`   VARCHAR(45)           NOT NULL,
+    `grade`      VARCHAR(255)          NOT NULL,
+    `upgrade_at` datetime              NULL,
+    `is_active`  BIT(1)                NULL,
+    `created_at` datetime              NOT NULL,
+    CONSTRAINT `pk_user_tb` PRIMARY KEY (`id`)
 );
 
-ALTER TABLE user_tb
-    ADD CONSTRAINT uc_user_tb_email UNIQUE (email);
+ALTER TABLE `user_tb`
+    ADD CONSTRAINT `uc_user_tb_email` UNIQUE (`email`);
