@@ -1,4 +1,4 @@
-package com.kakao.sunsuwedding.match.Quotation;
+package com.kakao.sunsuwedding.quotation;
 
 import lombok.RequiredArgsConstructor;
 

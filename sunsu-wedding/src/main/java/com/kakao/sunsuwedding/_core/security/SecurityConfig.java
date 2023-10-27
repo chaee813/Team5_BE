@@ -19,8 +19,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-@RequiredArgsConstructor
+
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtExceptionFilter jwtExceptionFilter;
@@ -110,7 +111,8 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/portfolios", "PUT"),
                                 new AntPathRequestMatcher("/portfolios", "DELETE"),
                                 new AntPathRequestMatcher("/quotations/**", "PUT"),
-                                new AntPathRequestMatcher("/quotations/**", "POST")
+                                new AntPathRequestMatcher("/quotations/**", "POST"),
+                                new AntPathRequestMatcher("/quotations/**", "DELETE")
                         ).hasRole("planner")
                         .anyRequest().permitAll()
         );

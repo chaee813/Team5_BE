@@ -2,8 +2,8 @@ package com.kakao.sunsuwedding._core.utils;
 
 import com.kakao.sunsuwedding.match.Match;
 import com.kakao.sunsuwedding.match.MatchStatus;
-import com.kakao.sunsuwedding.match.Quotation.Quotation;
-import com.kakao.sunsuwedding.match.Quotation.QuotationStatus;
+import com.kakao.sunsuwedding.quotation.Quotation;
+import com.kakao.sunsuwedding.quotation.QuotationStatus;
 import com.kakao.sunsuwedding.portfolio.PortfolioResponse;
 
 import java.util.List;
@@ -28,6 +28,7 @@ public class PriceCalculator {
     }
 
     public static Long calculateAvgPrice(List<Match> matches, Long contractCount) {
+        if (contractCount.equals(0L)) return 0L;
         return matches.stream()
                 .filter(match -> match.getStatus().equals(MatchStatus.CONFIRMED))
                 .mapToLong(Match::getConfirmedPrice)

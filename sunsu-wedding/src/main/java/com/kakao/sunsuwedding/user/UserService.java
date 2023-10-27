@@ -22,10 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Objects;
 import java.util.Optional;
 
-@Transactional(readOnly = true)
-@RequiredArgsConstructor
 @Service
 @Slf4j
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserJPARepository userJPARepository;
@@ -74,7 +74,8 @@ public class UserService {
     }
 
     public UserResponse.FindById findById(Long userId) {
-        return new UserResponse.FindById(findUserById(userId));
+        User user = findUserById(userId);
+        return new UserResponse.FindById(user);
     }
 
     // 회원 탈퇴

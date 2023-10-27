@@ -2,13 +2,14 @@ package com.kakao.sunsuwedding.portfolio.image;
 
 import com.kakao.sunsuwedding.portfolio.Portfolio;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@NoArgsConstructor
+
 @Entity
+@Table(name = "imageitem_tb")
 @NamedEntityGraphs({
         @NamedEntityGraph(
                 name = "ImageItemWithPortfolio",
@@ -20,7 +21,8 @@ import lombok.NoArgsConstructor;
                 subgraphs = @NamedSubgraph(name = "portfolioSubgraph", attributeNodes = @NamedAttributeNode("planner"))
         )
 })
-@Table(name = "imageitem_tb")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ImageItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,13 +31,13 @@ public class ImageItem {
     @ManyToOne(fetch = FetchType.LAZY)
     private Portfolio portfolio;
 
-    @Column(nullable = false)
+    @Column(name = "origin_file_name", nullable = false)
     private String originFileName;
 
-    @Column(nullable = false)
+    @Column(name = "file_path", nullable = false)
     private String filePath;
 
-    @Column(nullable = false)
+    @Column(name = "file_size", nullable = false)
     private Long fileSize;
 
     @Column(nullable = false)

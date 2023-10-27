@@ -1,6 +1,7 @@
 package com.kakao.sunsuwedding.portfolio.image;
 
 import com.kakao.sunsuwedding._core.errors.BaseException;
+import com.kakao.sunsuwedding._core.errors.exception.BadRequestException;
 import com.kakao.sunsuwedding._core.errors.exception.ServerException;
 import com.kakao.sunsuwedding.portfolio.Portfolio;
 import com.kakao.sunsuwedding.user.planner.Planner;
@@ -19,12 +20,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ImageItemService {
     private static final Logger logger = LoggerFactory.getLogger(ImageItemService.class);
 
     private final ImageItemJPARepository imageItemJPARepository;
+    private final ImageItemJDBCRepository imageItemJDBCRepository;
 
     private String setDirectoryPath(Long id, String username) {
         String separator = System.getProperty("file.separator");
@@ -89,11 +91,14 @@ public class ImageItemService {
                     .build();
             imageItems.add(imageItem);
         }
-        imageItemJPARepository.saveAll(imageItems);
+        imageItemJDBCRepository.batchInsertImageItems(imageItems);
     }
 
 
     public void uploadImage(MultipartFile[] images, Portfolio portfolio, Planner planner) {
+        // 요청받은 이미지가 5개를 넘으면 예외처리
+        if (images.length > 5) throw new BadRequestException(BaseException.PORTFOLIO_IMAGE_COUNT_EXCEED);
+
         // 저장 경로 설정 (root -> gallery -> {userId}_{username} 폴더)
         String uploadDirectory = setDirectoryPath(planner.getId(), planner.getUsername());
         makeDirectory(uploadDirectory);
@@ -104,6 +109,9 @@ public class ImageItemService {
 
     @Transactional
     public void updateImage(MultipartFile[] images, Portfolio portfolio, Planner planner) {
+        // 요청받은 이미지가 5개를 넘으면 예외처리
+        if (images.length > 5) throw new BadRequestException(BaseException.PORTFOLIO_IMAGE_COUNT_EXCEED);
+
         // 저장 경로 설정 (root -> gallery -> {userId}_{username} 폴더)
         String uploadDirectory = setDirectoryPath(planner.getId(), planner.getUsername());
         File directory = makeDirectory(uploadDirectory);

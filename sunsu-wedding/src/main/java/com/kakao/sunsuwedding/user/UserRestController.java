@@ -11,12 +11,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/user")
 public class UserRestController {
     private final UserService userService;
     private final TokenService tokenService;
+    private final JWTProvider jwtProvider;
 
     // 회원가입
     @PostMapping("/signup")
@@ -31,8 +32,8 @@ public class UserRestController {
         TokenDTO tokens = userService.login(requestDTO);
         return ResponseEntity
                 .ok()
-                .header(JWTProvider.AUTHORIZATION_HEADER, tokens.accessToken())
-                .header(JWTProvider.REFRESH_HEADER, tokens.refreshToken())
+                .header(jwtProvider.AUTHORIZATION_HEADER, tokens.accessToken())
+                .header(jwtProvider.REFRESH_HEADER, tokens.refreshToken())
                 .body(ApiUtils.success(null));
     }
 
@@ -41,8 +42,8 @@ public class UserRestController {
         TokenDTO tokens = tokenService.refreshAllTokens(userDetails.getUser());
         return ResponseEntity
                 .ok()
-                .header(JWTProvider.AUTHORIZATION_HEADER, tokens.accessToken())
-                .header(JWTProvider.REFRESH_HEADER, tokens.refreshToken())
+                .header(jwtProvider.AUTHORIZATION_HEADER, tokens.accessToken())
+                .header(jwtProvider.REFRESH_HEADER, tokens.refreshToken())
                 .body(ApiUtils.success(null));
     }
 

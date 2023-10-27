@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,13 +33,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserRestControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(UserRestControllerTest.class);
-    private CustomUserDetailsService customUserDetailsService;
 
     @Autowired
     private MockMvc mvc;
 
     @Autowired
     private ObjectMapper om;
+
+    @Autowired
+    private JWTProvider jwtProvider;
 
     // ============ 회원가입 테스트 ============
     @DisplayName("회원가입 성공 테스트")
@@ -61,8 +64,7 @@ public class UserRestControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
-        String responseBody = result.andReturn().getResponse().getContentAsString();
-        logger.debug("테스트 : " + responseBody);
+        logResult(result);
 
         // then
         result.andExpect(MockMvcResultMatchers.jsonPath("$.success").value("true"));
@@ -89,8 +91,7 @@ public class UserRestControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
-        String responseBody = result.andReturn().getResponse().getContentAsString();
-        logger.debug("테스트 : " + responseBody);
+        logResult(result);
 
         // then
         result.andExpect(MockMvcResultMatchers.jsonPath("$.success").value("false"));
@@ -117,8 +118,7 @@ public class UserRestControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
         );
 
-        String responseBody = result.andReturn().getResponse().getContentAsString();
-        logger.debug("테스트 : " + responseBody);
+        logResult(result);
 
         // then
         result.andExpect(MockMvcResultMatchers.jsonPath("$.success").value("false"));
@@ -145,8 +145,8 @@ public class UserRestControllerTest {
         );
 
         String responseBody = result.andReturn().getResponse().getContentAsString();
-        String accessTokenHeader = result.andReturn().getResponse().getHeader(JWTProvider.AUTHORIZATION_HEADER);
-        String refreshTokenHeader = result.andReturn().getResponse().getHeader(JWTProvider.REFRESH_HEADER);
+        String accessTokenHeader = result.andReturn().getResponse().getHeader(jwtProvider.AUTHORIZATION_HEADER);
+        String refreshTokenHeader = result.andReturn().getResponse().getHeader(jwtProvider.REFRESH_HEADER);
         logger.debug("테스트 : " + responseBody);
         logger.debug("테스트 access token  : " + accessTokenHeader);
         logger.debug("테스트 refresh token : " + refreshTokenHeader);
@@ -171,8 +171,8 @@ public class UserRestControllerTest {
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON)
         );
-        String responseBody = result.andReturn().getResponse().getContentAsString();
-        logger.debug("테스트 : " + responseBody);
+
+        logResult(result);
 
         // then
         result.andExpect(MockMvcResultMatchers.jsonPath("$.success").value("false"));
@@ -196,8 +196,8 @@ public class UserRestControllerTest {
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON)
         );
-        String responseBody = result.andReturn().getResponse().getContentAsString();
-        logger.debug("테스트 : " + responseBody);
+
+        logResult(result);
 
         // then
         result.andExpect(jsonPath("$.success").value("false"));
@@ -205,9 +205,8 @@ public class UserRestControllerTest {
         result.andExpect(jsonPath("$.error.message").value("패스워드를 잘못 입력하셨습니다"));
     }
 
-    /*
     // ============ 회원 탈퇴 테스트 ============
-    /*
+
     @DisplayName("회원 탈퇴 성공 테스트")
     @Test
     @WithUserDetails("couple@gmail.com")
@@ -216,14 +215,48 @@ public class UserRestControllerTest {
 
         // when
         ResultActions result = mvc.perform(
-                MockMvcRequestBuilders
-                        .delete("/user")
+                MockMvcRequestBuilders.delete("/user")
         );
-        String responseBody = result.andReturn().getResponse().getContentAsString();
-        logger.debug("테스트 : " + responseBody);
+
+        logResult(result);
 
         // then
         result.andExpect(MockMvcResultMatchers.jsonPath("$.success").value("true"));
     }
-   */
+
+    // ============ 유저 정보 조회 ============
+    @DisplayName("유저 정보 조회 성공")
+    @Test
+    @WithUserDetails("planner@gmail.com")
+    void get_user_info_success_test() throws Exception {
+        // when
+        ResultActions resultActions = mvc.perform(
+                MockMvcRequestBuilders
+                        .get("/user/info")
+        );
+        // then
+        resultActions.andExpect(jsonPath("$.success").value("true"));
+        resultActions.andExpect(jsonPath("$.response.username").value("planner"));
+        resultActions.andExpect(jsonPath("$.response.email").value("planner@gmail.com"));
+        resultActions.andExpect(jsonPath("$.response.role").value("planner"));
+        resultActions.andExpect(jsonPath("$.response.grade").value("normal"));
+    }
+    // ============ 유저 토큰 갱신 ============
+    @DisplayName("유저 토큰 refresh 성공")
+    @Test
+    @WithUserDetails("planner@gmail.com")
+    void user_token_refresh_success_test() throws Exception {
+        // when
+        ResultActions resultActions = mvc.perform(
+                MockMvcRequestBuilders
+                        .put("/user/token")
+        );
+        // then
+        resultActions.andExpect(jsonPath("$.success").value("true"));
+    }
+
+    private void logResult(ResultActions result) throws Exception {
+        String responseBody = result.andReturn().getResponse().getContentAsString();
+        logger.debug("테스트 : " + responseBody);
+    }
 }

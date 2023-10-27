@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakao.sunsuwedding._core.errors.BaseException;
 import com.kakao.sunsuwedding._core.errors.exception.ForbiddenException;
 import com.kakao.sunsuwedding._core.errors.exception.NotFoundException;
+import com.kakao.sunsuwedding._core.errors.exception.TokenException;
 import com.kakao.sunsuwedding._core.errors.exception.UnauthorizedException;
 import com.kakao.sunsuwedding._core.utils.FilterResponseUtils;
 import jakarta.servlet.FilterChain;
@@ -36,6 +37,9 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         try {
             chain.doFilter(request, response);
         }
+        catch (TokenException tokenException) {
+            filterResponseUtils.tokenError(response, tokenException);
+        }
         catch (UnauthorizedException unauthorizedException) {
             filterResponseUtils.unAuthorized(response, unauthorizedException);
         }
@@ -46,7 +50,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             filterResponseUtils.notFound(response, notFoundException);
         }
         catch (JWTCreationException | JWTVerificationException e) {
-            filterResponseUtils.unAuthorized(response, new UnauthorizedException(BaseException.USER_TOKEN_WRONG));
+            filterResponseUtils.unAuthorized(response, new UnauthorizedException(BaseException.TOKEN_NOT_FOUND));
         }
     }
 }
