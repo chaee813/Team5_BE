@@ -18,7 +18,3 @@ spring:
         format_sql: true
       default_batch_fetch_size: 100
     open-in-view: false
-  sql:
-    init:
-      data-locations: classpath:db/teardown.sql
-      mode: always
