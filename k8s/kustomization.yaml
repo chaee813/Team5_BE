@@ -11,3 +11,8 @@ configMapGenerator:
   - name: init-db
     files:
       - configs/init.sql
+secretGenerator:
+- name: database-creds
+  files:
+  - username.txt
+  - password.txt
