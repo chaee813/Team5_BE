@@ -19,6 +19,10 @@ spec:
           # 이미지를 넣어주세요.
           image: krmp-d2hub-idock.9rum.cc/dev-test/repo_77a7183676cc
           env:
+            - name: TZ
+              value: Asia/Seoul
+            - name: DATABASE_URL
+              value: jdbc:mysql://mysql:3306/sunsu_wedding
             - name: MYSQL_USERNAME
                 valueFrom: 
                   secretKeyRef:
