@@ -11,4 +11,6 @@ RUN ./gradlew clean build
 
 ENV DATABASE_URL=jdbc:mysql://mysql/sunsu_wedding
 
+ENV MYSQL_ROOT_PASSWORD="root"
+
 CMD ["java", "-jar", "-Dspring.profiles.active=prod", "/home/gradle/project/build/libs/sunsu-wedding-0.0.1-SNAPSHOT.jar"]
