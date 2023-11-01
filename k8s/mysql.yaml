@@ -23,12 +23,12 @@ spec:
             - name: MYSQL_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: root
+                  name: secret
                   key: MYSQL_USERNAME
             - name: MYSQL_PASSWORD
               valueFrom: 
                 secretKeyRef:
-                  name: secrets
+                  name: secret
                   key: MYSQL_PASSWORD 
             - name: MYSQL_DATABASE
               value: sunsu_wedding
