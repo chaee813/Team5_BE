@@ -21,16 +21,6 @@ spec:
           env:
             - name: TZ
               value: Asia/Seoul
-            - name: MYSQL_USERNAME
-                valueFrom: 
-                  secretKeyRef:
-                    name: secret
-                    key: MYSQL_USERNAME
-            - name: MYSQL_PASSWORD
-              valueFrom: 
-                secretKeyRef: 
-                  name: secret
-                  key: MYSQL_PASSWORD 
           resources:
             requests:
               memory: 1Gi
