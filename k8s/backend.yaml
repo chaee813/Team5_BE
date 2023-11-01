@@ -21,17 +21,15 @@ spec:
           env:
             - name: TZ
               value: Asia/Seoul
-            - name: DATABASE_URL
-              value: jdbc:mysql://mysql:3306/sunsu_wedding
             - name: MYSQL_USERNAME
                 valueFrom: 
                   secretKeyRef:
-                    name: secrets
+                    name: secret
                     key: MYSQL_USERNAME
             - name: MYSQL_PASSWORD
               valueFrom: 
                 secretKeyRef: 
-                  name: secrets
+                  name: secret
                   key: MYSQL_PASSWORD 
           resources:
             requests:
