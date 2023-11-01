@@ -1,19 +1,11 @@
 CREATE SCHEMA IF NOT EXISTS `sunsu_wedding` DEFAULT CHARACTER SET utf8mb4;
 
-GRANT ALL ON *.* TO 'root'@'localhost' IDENTIFIED BY 'root' WITH GRANT OPTION;
-GRANT ALL ON sunsu_wedding.* TO 'root'@'localhost';
+GRANT ALL ON *.* TO 'sunsu'@'localhost' IDENTIFIED BY 'sunsu' WITH GRANT OPTION;
+GRANT ALL ON sunsu_wedding.* TO 'sunsu'@'localhost';
 FLUSH PRIVILEGES;
 
 USE `sunsu_wedding`;
 
-DROP TABLE IF EXISTS `sample_data`;
-CREATE TABLE `sample_data` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `detail` varchar(100) NOT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-INSERT INTO sample_data (`id`,`detail`) VALUES ('1', 'Hello DKOS!');
 
 CREATE TABLE IF NOT EXISTS user_tb
 (
