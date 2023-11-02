@@ -17,15 +17,29 @@ spec:
       containers:
         - name: backend
           # 이미지를 넣어주세요.
-          image: krmp-d2hub-idock.9rum.cc/dev-test/repo_77a7183676cc
+          image: krmp-d2hub-idock.9rum.cc/dev-test/repo_f0df3e2f61ea
           env:
             - name: TZ
               value: Asia/Seoul
-            - name: DATABASE_URL
-              value: jdbc:mariadb://mariadb:3306/krampoline
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: secret
+                  key: MYSQL_USERNAME
+            - name: MYSQL_PASSWORD
+              valueFrom: 
+                secretKeyRef:
+                  name: secret
+                  key: MYSQL_PASSWORD 
           resources:
             requests:
               memory: 1Gi
+        
 ---
 apiVersion: v1
 kind: Service

@@ -15,20 +15,25 @@ spec:
     spec:
       containers:
         - name: mysql
-          # 여러분의 mariadb image 주소를 입력해주세요.
+          # 여러분의 db image 주소를 입력해주세요.
           image: mysql:8.0
           env:
             - name: TZ
               value: Asia/Seoul
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                    name: secret
+                    key: MYSQL_ROOT_PASSWORD
             - name: MYSQL_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: secrets
+                  name: secret
                   key: MYSQL_USERNAME
             - name: MYSQL_PASSWORD
               valueFrom: 
                 secretKeyRef:
-                  name: secrets
+                  name: secret
                   key: MYSQL_PASSWORD 
             - name: MYSQL_DATABASE
               value: sunsu_wedding

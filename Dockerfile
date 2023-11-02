@@ -9,6 +9,6 @@ RUN echo "systemProp.http.proxyHost=krmp-proxy.9rum.cc\nsystemProp.http.proxyPor
 
 RUN ./gradlew clean build
 
-ENV DATABASE_URL=jdbc:mariadb://mariadb:3306/krampoline
+ENV DATABASE_URL=jdbc:mysql://mysql/sunsu_wedding
 
 CMD ["java", "-jar", "-Dspring.profiles.active=prod", "/home/gradle/project/build/libs/sunsu-wedding-0.0.1-SNAPSHOT.jar"]
