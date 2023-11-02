@@ -50,6 +50,9 @@ public class MatchService {
     }
 
     public MatchResponse.FindAllWithNoReviewDTO findAllWithNoReview(Pair<String, Long> info) {
+        if (info.getFirst().equals(Role.PLANNER.getRoleName())) {
+            throw new ForbiddenException(BaseException.PERMISSION_DENIED_METHOD_ACCESS);
+        }
         Couple couple = coupleJPARepository.findById(info.getSecond()).orElseThrow(
                 () -> new NotFoundException(BaseException.USER_NOT_FOUND)
         );
