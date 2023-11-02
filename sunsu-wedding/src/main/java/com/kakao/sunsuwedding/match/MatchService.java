@@ -9,7 +9,6 @@ import com.kakao.sunsuwedding.portfolio.PortfolioService;
 import com.kakao.sunsuwedding.quotation.Quotation;
 import com.kakao.sunsuwedding.quotation.QuotationJPARepository;
 import com.kakao.sunsuwedding.quotation.QuotationStatus;
-import com.kakao.sunsuwedding.review.ReviewResponse;
 import com.kakao.sunsuwedding.user.constant.Role;
 import com.kakao.sunsuwedding.user.couple.Couple;
 import com.kakao.sunsuwedding.user.couple.CoupleJPARepository;
