@@ -51,7 +51,8 @@ public class UserService {
             throw new ServerException(BaseException.USER_UNEXPECTED_ERROR);
         }
     }
-
+    
+    @Transactional
     public TokenDTO login(UserRequest.LoginDTO requestDTO) {
         User user = userJPARepository.findByEmail(requestDTO.getEmail()).orElseThrow(
                 () -> new BadRequestException(BaseException.USER_EMAIL_NOT_FOUND.getMessage() + requestDTO.getEmail())
