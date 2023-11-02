@@ -21,9 +21,10 @@ spec:
             - name: TZ
               value: Asia/Seoul
             - name: MYSQL_ROOT_PASSWORD
-              secretKeyRef:
-                  name: secret
-                  key: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                    name: secret
+                    key: MYSQL_ROOT_PASSWORD
             - name: MYSQL_USERNAME
               valueFrom:
                 secretKeyRef:
