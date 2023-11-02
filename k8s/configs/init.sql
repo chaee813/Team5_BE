@@ -1,9 +1,5 @@
 CREATE SCHEMA IF NOT EXISTS `sunsu_wedding` DEFAULT CHARACTER SET utf8mb4;
 
-GRANT ALL ON *.* TO 'sunsu'@'localhost' IDENTIFIED BY 'sunsu' WITH GRANT OPTION;
-GRANT ALL ON sunsu_wedding.* TO 'sunsu'@'localhost';
-FLUSH PRIVILEGES;
-
 USE `sunsu_wedding`;
 
 
