@@ -45,6 +45,7 @@ public class MatchService {
                         .planner(planner)
                         .chat(chat)
                         .price(0L)
+                        .reviewStatus(ReviewStatus.UNWRITTEN)
                         .build()
         );
     }
