@@ -8,14 +8,19 @@ import com.kakao.sunsuwedding._core.utils.PriceCalculator;
 import com.kakao.sunsuwedding.match.Match;
 import com.kakao.sunsuwedding.match.MatchJPARepository;
 import com.kakao.sunsuwedding.match.MatchStatus;
+import com.kakao.sunsuwedding.user.base_user.User;
 import com.kakao.sunsuwedding.user.constant.Role;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.util.Pair;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,11 +30,11 @@ public class QuotationService {
     private final QuotationJPARepository quotationJPARepository;
 
     @Transactional
-    public void insertQuotation(Pair<String, Long> info, Long chatId, QuotationRequest.Add request) {
-        Match match = getMatchByChatIdAndPlannerId(info, chatId);
+    public void insertQuotation(User user, Long chatId, QuotationRequest.Add request) {
+        Match match = getMatchByChatIdAndPlannerId(user, chatId);
 
         if (match.getStatus().equals(MatchStatus.CONFIRMED)) {
-            throw new ForbiddenException(BaseException.MATCHING_ALREADY_CONFIRMED);
+            throw new BadRequestException(BaseException.MATCHING_ALREADY_CONFIRMED);
         }
 
         // 기존 매칭 가격에서 해당 견적서 가격 업데이터
@@ -61,20 +66,26 @@ public class QuotationService {
     }
 
     // 견적서 모아보기
-    public QuotationResponse.FindByUserDTO findQuotationsByUser(Pair<String, Long> info) {
-        String role = info.getFirst();
-        Long userId = info.getSecond();
+    public QuotationResponse.FindByUserDTO findQuotationsByUser(User user, int page) {
+        Pageable pageable = PageRequest.of(page, 10);
 
-        List<Quotation> quotations = getQuotationsByUser(role, userId);
+        Page<Quotation> pageContent = getQuotationsByUser(user.getDtype(), user.getId(), pageable);
+        List<Quotation> quotations = pageContent.getContent();
 
-        List<QuotationResponse.QuotationsCollectDTO> quotationDTOS = getQuotationDTOSByUser(role, userId, quotations);
+        Map<Long, List<Quotation>> quotationsByChatId = quotations.stream().collect(
+                Collectors.groupingBy(quotation -> quotation.getMatch().getChat().getId())
+        );
+        List<Long> chatIds = quotationsByChatId.keySet().stream().toList();
 
-        return new QuotationResponse.FindByUserDTO(quotationDTOS);
+        List<QuotationResponse.QuotationsByChatIdDTO> quotationsByChatIdDTOS =
+                QuotationDTOConverter.toQuotationsByChatIdDTO(quotationsByChatId, chatIds, user.getDtype());
+
+        return new QuotationResponse.FindByUserDTO(quotationsByChatIdDTOS);
     }
 
     @Transactional
-    public void confirm(Pair<String, Long> info, Long chatId, Long quotationId) {
-        Match match = getMatchByChatIdAndPlannerId(info, chatId);
+    public void confirm(User user, Long chatId, Long quotationId) {
+        Match match = getMatchByChatIdAndPlannerId(user, chatId);
 
         if (match.getStatus().equals(MatchStatus.CONFIRMED)) {
             throw new BadRequestException(BaseException.QUOTATION_ALREADY_CONFIRMED);
@@ -93,8 +104,8 @@ public class QuotationService {
     }
 
     @Transactional
-    public void update(Pair<String, Long> info, Long chatId, Long quotationId, QuotationRequest.Update request) {
-        Match match = getMatchByChatIdAndPlannerId(info, chatId);
+    public void update(User user, Long chatId, Long quotationId, QuotationRequest.Update request) {
+        Match match = getMatchByChatIdAndPlannerId(user, chatId);
 
         if (match.getStatus().equals(MatchStatus.CONFIRMED)) {
             throw new BadRequestException(BaseException.QUOTATION_ALREADY_CONFIRMED);
@@ -115,15 +126,27 @@ public class QuotationService {
         }
     }
 
-    private Match getMatchByChatIdAndPlannerId(Pair<String, Long> info, Long chatId) {
+    @Transactional
+    public void deleteQuotation(User user, Long quotationId) {
+        Quotation quotation = quotationJPARepository.findById(quotationId).orElseThrow(
+                () -> new NotFoundException(BaseException.QUOTATION_NOT_FOUND)
+        );
+
+        if (!quotation.getMatch().getPlanner().getId().equals(user.getId())) {
+            throw new ForbiddenException(BaseException.PERMISSION_DENIED_METHOD_ACCESS);
+        }
+
+        quotationJPARepository.delete(quotation);
+    }
+
+    private Match getMatchByChatIdAndPlannerId(User user, Long chatId) {
         // 매칭 내역이 존재하지 않을 때는 404 에러를 내보내야 하고
         // 해당 매칭 내역에 접근할 수 없다면 403 에러를 내보내야 하기 때문에
         // 매칭 ID 로만 조회 후 권한 체크
         Match match = matchJPARepository.findByChatId(chatId)
                 .orElseThrow(() -> new NotFoundException(BaseException.MATCHING_NOT_FOUND));
 
-        Long plannerId = info.getSecond();
-        if (!match.getPlanner().getId().equals(plannerId)) {
+        if (!match.getPlanner().getId().equals(user.getId())) {
             throw new ForbiddenException(BaseException.QUOTATION_ACCESS_DENIED);
         }
 
@@ -144,13 +167,9 @@ public class QuotationService {
         return quotation;
     }
 
-    private List<Quotation> getQuotationsByUser(String role, Long id) {
+    private Page<Quotation> getQuotationsByUser(String role, Long id, Pageable pageable) {
         return role.equals(Role.PLANNER.getRoleName()) ?
-                quotationJPARepository.findAllByMatchPlannerId(id) : quotationJPARepository.findAllByMatchCoupleId(id);
-    }
-
-    private List<QuotationResponse.QuotationsCollectDTO> getQuotationDTOSByUser(String role, Long id, List<Quotation> quotations) {
-        return role.equals(Role.PLANNER.getRoleName()) ?
-                QuotationDTOConverter.toFindByPlannerDTO(quotations) : QuotationDTOConverter.toFindByCoupleDTO(quotations);
+                quotationJPARepository.findAllByMatchPlannerIdOrderByModifiedAtDesc(id, pageable) :
+                quotationJPARepository.findAllByMatchCoupleIdOrderByModifiedAtDesc(id, pageable);
     }
 }

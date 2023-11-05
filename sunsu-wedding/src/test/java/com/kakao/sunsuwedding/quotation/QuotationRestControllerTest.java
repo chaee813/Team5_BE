@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kakao.sunsuwedding._core.security.JWTProvider;
 import com.kakao.sunsuwedding._core.config.SecurityConfig;
 import com.kakao.sunsuwedding.user.UserRequest;
+import com.kakao.sunsuwedding.user.UserResponse;
 import com.kakao.sunsuwedding.user.UserService;
 import com.kakao.sunsuwedding.user.token.TokenDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -56,11 +58,9 @@ public class QuotationRestControllerTest {
 
     @BeforeEach
     void beforeEach() {
-        UserRequest.LoginDTO request = new UserRequest.LoginDTO();
-        request.setEmail("planner1@gmail.com");
-        request.setPassword("planner1234!");
-        TokenDTO tokenDTO = userService.login(request);
-        plannerToken = tokenDTO.accessToken();
+        UserRequest.LoginDTO request = new UserRequest.LoginDTO("planner1@gmail.com", "planner1234!");
+        Pair<TokenDTO, UserResponse.FindUserId> response = userService.login(request);
+        plannerToken = response.getFirst().accessToken();
     }
     // ============ 견적서 등록 테스트 ============
     @DisplayName("POST /quotations : success")
@@ -290,9 +290,10 @@ public class QuotationRestControllerTest {
 
         // then
         resultActions.andExpect(jsonPath("$.success").value("true"));
-        resultActions.andExpect(jsonPath("$.response.quotations[0].partnerName").value("couple"));
-        resultActions.andExpect(jsonPath("$.response.quotations[0].id").value(1));
-        resultActions.andExpect(jsonPath("$.response.quotations[0].price").value(1000000));
+        resultActions.andExpect(jsonPath("$.response.chats[0].chatId").value(7));
+        resultActions.andExpect(jsonPath("$.response.chats[0].partnerName").value("couple4"));
+        resultActions.andExpect(jsonPath("$.response.chats[0].quotations[0].id").value(7));
+        resultActions.andExpect(jsonPath("$.response.chats[0].quotations[0].price").value(1000000));
     }
 
 
@@ -565,7 +566,41 @@ public class QuotationRestControllerTest {
     }
 
     // ============ 견적서 삭제 테스트 ============
+    @DisplayName("견적서 삭제 성공 테스트")
+    @Test
+    void delete_quotation_success_test() throws Exception {
+        // given
+        Long quotationId = 3L;
 
+        // when
+        ResultActions resultActions = mvc.perform(
+                MockMvcRequestBuilders
+                        .delete("/quotations/" + quotationId)
+                        .header("Authorization", plannerToken)
+        );
+
+        // then
+        resultActions.andExpect(jsonPath("$.success").value("true"));
+    }
+
+    @DisplayName("견적서 삭제 실패 테스트 - 본인의 요청 X")
+    @Test
+    void delete_quotation_fail_test_permission_denied() throws Exception {
+        // given
+        Long quotationId = 6L;
+
+        // when
+        ResultActions resultActions = mvc.perform(
+                MockMvcRequestBuilders
+                        .delete("/quotations/" + quotationId)
+                        .header("Authorization", plannerToken)
+        );
+
+        // then
+        resultActions.andExpect(jsonPath("$.success").value("false"));
+        resultActions.andExpect(jsonPath("$.error.message").value("사용할 수 없는 기능입니다."));
+        resultActions.andExpect(jsonPath("$.error.status").value("403"));
+    }
 
 
 
