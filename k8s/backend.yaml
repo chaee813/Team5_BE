@@ -36,6 +36,21 @@ spec:
                 secretKeyRef:
                   name: secret
                   key: MYSQL_PASSWORD 
+            - name: JWT_ACCESS_SECRET
+              valueFrom: 
+                secretKeyRef:
+                  name: secret
+                  key: JWT_ACCESS_SECRET
+            - name: JWT_REFRESH_SECRET
+              valueFrom: 
+                secretKeyRef:
+                  name: secret
+                  key: JWT_REFRESH_SECRET
+            - name: TOSS_PAYMENT_SECRET
+              valueFrom: 
+                secretKeyRef:
+                  name: secret
+                  key: TOSS_PAYMENT_SECRET
           resources:
             requests:
               memory: 1Gi
