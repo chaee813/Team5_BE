@@ -30,10 +30,10 @@ public class PortfolioRestController {
 
     @GetMapping(value = "")
     public ResponseEntity<?> findPortfolios(@RequestParam(defaultValue = "-1") @Min(-2) Long cursor,
-                                           @RequestParam @Nullable String name,
-                                           @RequestParam @Nullable String location,
-                                           @RequestParam @Nullable Long minPrice,
-                                           @RequestParam @Nullable Long maxPrice,
+                                           @RequestParam(required = false) @Nullable String name,
+                                           @RequestParam(required = false) @Nullable String location,
+                                           @RequestParam(required = false) @Nullable Long minPrice,
+                                           @RequestParam(required = false) @Nullable Long maxPrice,
                                            @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         Long userId = (userDetails == null) ? -1 : userDetails.getUser().getId();
