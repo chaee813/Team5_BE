@@ -5,7 +5,7 @@ import com.kakao.sunsuwedding._core.security.JWTProvider;
 import com.kakao.sunsuwedding._core.config.SecurityConfig;
 import com.kakao.sunsuwedding.user.UserRequest;
 import com.kakao.sunsuwedding.user.UserResponse;
-import com.kakao.sunsuwedding.user.UserService;
+import com.kakao.sunsuwedding.user.UserServiceImpl;
 import com.kakao.sunsuwedding.user.token.TokenDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,7 +36,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(properties = {
         "security.jwt-config.secret.access=your-test-access-secret",
         "security.jwt-config.secret.refresh=your-test-refresh-secret",
-        "payment.toss.secret=your-test-toss-payment-secret"
+        "payment.toss.secret=your-test-toss-payment-secret",
+        "email.username=test@email.com",
+        "email.password=qweasdzxc"
 })
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class QuotationRestControllerTest {
@@ -49,7 +51,7 @@ public class QuotationRestControllerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Autowired
     private JWTProvider jwtProvider;
@@ -59,11 +61,11 @@ public class QuotationRestControllerTest {
     @BeforeEach
     void beforeEach() {
         UserRequest.LoginDTO request = new UserRequest.LoginDTO("planner1@gmail.com", "planner1234!");
-        Pair<TokenDTO, UserResponse.FindUserId> response = userService.login(request);
+        Pair<TokenDTO, UserResponse.FindUserId> response = userServiceImpl.login(request);
         plannerToken = response.getFirst().accessToken();
     }
     // ============ 견적서 등록 테스트 ============
-    @DisplayName("POST /api/quotations : success")
+    @DisplayName("POST /api/quotation : success")
     @Test
     void post_quotations_success() throws Exception {
         // given
@@ -79,7 +81,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/quotations")
+                        .post("/api/quotation")
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -90,7 +92,7 @@ public class QuotationRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("false"));
     }
 
-    @DisplayName("POST /api/quotations : fail, 제목 글자수 위반")
+    @DisplayName("POST /api/quotation : fail, 제목 글자수 위반")
     @Test
     void post_quotations_fail_titleTextSize() throws Exception {
         // given
@@ -106,7 +108,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/quotations")
+                        .post("/api/quotation")
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -117,9 +119,9 @@ public class QuotationRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("false"));
     }
 
-    @DisplayName("POST /api/quotations : fail, 제목 글자수 위반")
+    @DisplayName("POST /api/quotation : fail, 제목 글자수 위반")
     @Test
-    void post_quotations_fail_emptyTitle() throws Exception {
+    void post_quotation_fail_emptyTitle() throws Exception {
         // given
         Long chatId = 1L;
         QuotationRequest.Add request = new QuotationRequest.Add(
@@ -133,7 +135,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/quotations")
+                        .post("/api/quotation")
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -144,9 +146,9 @@ public class QuotationRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("false"));
     }
 
-    @DisplayName("POST /api/quotations : fail, 제목 글자수 위반")
+    @DisplayName("POST /api/quotation : fail, 제목 글자수 위반")
     @Test
-    void post_quotations_fail_titleSizeZero() throws Exception {
+    void post_quotation_fail_titleSizeZero() throws Exception {
         // given
         Long chatId = 1L;
         QuotationRequest.Add request = new QuotationRequest.Add(
@@ -160,7 +162,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/quotations")
+                        .post("/api/quotation")
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -171,9 +173,9 @@ public class QuotationRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("false"));
     }
 
-    @DisplayName("POST /api/quotations : fail, 견적가격 음수")
+    @DisplayName("POST /api/quotation : fail, 견적가격 음수")
     @Test
-    void post_quotations_fail_negativePrice() throws Exception {
+    void post_quotation_fail_negativePrice() throws Exception {
         // given
         Long chatId = 1L;
         QuotationRequest.Add request = new QuotationRequest.Add(
@@ -187,7 +189,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/quotations")
+                        .post("/api/quotation")
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -198,9 +200,9 @@ public class QuotationRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("false"));
     }
 
-    @DisplayName("POST /api/quotations : fail, 견적가격 누락")
+    @DisplayName("POST /api/quotation : fail, 견적가격 누락")
     @Test
-    void post_quotations_fail_emptyPrice() throws Exception {
+    void post_quotation_fail_emptyPrice() throws Exception {
         // given
         Long chatId = 1L;
         QuotationRequest.Add request = new QuotationRequest.Add(
@@ -214,7 +216,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/quotations")
+                        .post("/api/quotation")
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -226,16 +228,16 @@ public class QuotationRestControllerTest {
     }
 
     // ============ 견적서 조회 테스트 ============
-    @DisplayName("GET /api/quotations : success")
+    @DisplayName("GET /api/quotation : success")
     @Test
-    void get_quotations_success() throws Exception {
+    void get_quotation_success() throws Exception {
         // given
         Long chatId = 6L;
 
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .get("/api/quotations")
+                        .get("/api/quotation")
                         .header(jwtProvider.AUTHORIZATION_HEADER, plannerToken)
                         .param("chatId", String.valueOf(chatId))
         );
@@ -257,16 +259,16 @@ public class QuotationRestControllerTest {
         resultActions.andExpect(jsonPath("$.response.quotations[1].status").value("완료"));
     }
 
-    @DisplayName("GET /api/quotations : fail, 음수 chatId")
+    @DisplayName("GET /api/quotation : fail, 음수 chatId")
     @Test
-    void get_quotations_fail_negativechatId() throws Exception {
+    void get_quotation_fail_negativechatId() throws Exception {
         // given
         Long chatId = -1L;
 
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .get("/api/quotations")
+                        .get("/api/quotation")
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
         );
@@ -284,7 +286,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .get("/api/quotations/collect")
+                        .get("/api/quotation/all")
                         .header("Authorization", plannerToken)
         );
 
@@ -299,9 +301,9 @@ public class QuotationRestControllerTest {
 
 
     // ============ 견적서 1개 확정 테스트 ============
-    @DisplayName("POST /api/quotations/confirm/{quotationId}?chatId={chatId} : success")
+    @DisplayName("POST /api/quotation/confirm/{quotationId}?chatId={chatId} : success")
     @Test
-    void post_quotationsConfirm_success() throws Exception {
+    void post_quotationConfirm_success() throws Exception {
         // given
         Long chatId = 2L;
         Long quotationId = 3L;
@@ -309,7 +311,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/quotations/confirm/" + quotationId)
+                        .post("/api/quotation/confirm/" + quotationId)
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
         );
@@ -318,9 +320,9 @@ public class QuotationRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("true"));
     }
 
-    @DisplayName("POST /api/quotations/confirm/{quotationId}?chatId={chatId} : fail, 음수 id 요청")
+    @DisplayName("POST /api/quotation/confirm/{quotationId}?chatId={chatId} : fail, 음수 id 요청")
     @Test
-    void post_quotationsConfirm_fail_negativeId() throws Exception {
+    void post_quotationConfirm_fail_negativeId() throws Exception {
         // given
         Long chatId = -2L;
         Long quotationId = -3L;
@@ -328,7 +330,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/quotations/confirm/" + quotationId)
+                        .post("/api/quotation/confirm/" + quotationId)
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
         );
@@ -337,9 +339,9 @@ public class QuotationRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("false"));
     }
 
-    @DisplayName("POST /api/quotations/confirm/{quotationId}?chatId={chatId} : fail, 이미 확정된 견적서를 다시 확정 요청")
+    @DisplayName("POST /api/quotation/confirm/{quotationId}?chatId={chatId} : fail, 이미 확정된 견적서를 다시 확정 요청")
     @Test
-    void post_quotationsConfirm_fail_alreadyConfirmed() throws Exception {
+    void post_quotationConfirm_fail_alreadyConfirmed() throws Exception {
         // given
         Long chatId = 5L;
         Long quotationId = 6L;
@@ -347,7 +349,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/quotations/confirm/" + quotationId)
+                        .post("/api/quotation/confirm/" + quotationId)
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
         );
@@ -356,9 +358,9 @@ public class QuotationRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("false"));
     }
 
-    @DisplayName("POST /api/quotations/confirm/{quotationId}?chatId={chatId} : fail, 존재하지 않는 견적서 확정 요청")
+    @DisplayName("POST /api/quotation/confirm/{quotationId}?chatId={chatId} : fail, 존재하지 않는 견적서 확정 요청")
     @Test
-    void post_quotationsConfirm_fail_quotationNotExist() throws Exception {
+    void post_quotationConfirm_fail_quotationNotExist() throws Exception {
         // given
         Long chatId = 1L;
         Long quotationId = 100L;
@@ -366,7 +368,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/quotations/confirm/" + quotationId)
+                        .post("/api/quotation/confirm/" + quotationId)
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
         );
@@ -375,9 +377,9 @@ public class QuotationRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("false"));
     }
 
-    @DisplayName("POST /api/quotations/confirm/{quotationId}?chatId={chatId} : fail, 다른 플래너의 견적서 확정 요청")
+    @DisplayName("POST /api/quotation/confirm/{quotationId}?chatId={chatId} : fail, 다른 플래너의 견적서 확정 요청")
     @Test
-    void post_quotationsConfirm_fail_permissionDenied() throws Exception {
+    void post_quotationConfirm_fail_permissionDenied() throws Exception {
         // given
         Long chatId = 1L;
         Long quotationId = 100L;
@@ -385,7 +387,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/quotations/confirm/" + quotationId)
+                        .post("/api/quotation/confirm/" + quotationId)
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
         );
@@ -397,7 +399,7 @@ public class QuotationRestControllerTest {
 
 
     // ============ 견적서 수정 테스트 ============
-    @DisplayName("PUT /api/quotations/{quotationId}?chatId={chatId} : success")
+    @DisplayName("PUT /api/quotation/{quotationId}?chatId={chatId} : success")
     @Test
     void put_quotationUpdate_success() throws Exception {
         // given
@@ -414,7 +416,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .put("/api/quotations/" + quotationId)
+                        .put("/api/quotation/" + quotationId)
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -425,7 +427,7 @@ public class QuotationRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("true"));
     }
 
-    @DisplayName("PUT /api/quotations/{quotationId}?chatId={chatId} : fail, 타이틀 누락")
+    @DisplayName("PUT /api/quotation/{quotationId}?chatId={chatId} : fail, 타이틀 누락")
     @Test
     void put_quotationUpdate_fail_emptyTitle() throws Exception {
         // given
@@ -442,7 +444,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .put("/api/quotations/" + quotationId)
+                        .put("/api/quotation/" + quotationId)
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -453,7 +455,7 @@ public class QuotationRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("false"));
     }
 
-    @DisplayName("PUT /api/quotations/{quotationId}?chatId={chatId} : fail, 가격 누락")
+    @DisplayName("PUT /api/quotation/{quotationId}?chatId={chatId} : fail, 가격 누락")
     @Test
     void put_quotationUpdate_fail_emptyPrice() throws Exception {
         // given
@@ -470,7 +472,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .put("/api/quotations/" + quotationId)
+                        .put("/api/quotation/" + quotationId)
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -481,7 +483,7 @@ public class QuotationRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("false"));
     }
 
-    @DisplayName("PUT /api/quotations/{quotationId}?chatId={chatId} : fail, 음수 가격으로 변경 요청")
+    @DisplayName("PUT /api/quotation/{quotationId}?chatId={chatId} : fail, 음수 가격으로 변경 요청")
     @Test
     void put_quotationUpdate_fail_negativePrice() throws Exception {
         // given
@@ -498,7 +500,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .put("/api/quotations/" + quotationId)
+                        .put("/api/quotation/" + quotationId)
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -509,7 +511,7 @@ public class QuotationRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("false"));
     }
 
-    @DisplayName("PUT /api/quotations/{quotationId}?chatId={chatId} : fail, 존재하지 않는 견적서 수정 요청")
+    @DisplayName("PUT /api/quotation/{quotationId}?chatId={chatId} : fail, 존재하지 않는 견적서 수정 요청")
     @Test
     void put_quotationUpdate_fail_quotationNotExist() throws Exception {
         // given
@@ -526,7 +528,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .put("/api/quotations/" + quotationId)
+                        .put("/api/quotation/" + quotationId)
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -537,7 +539,7 @@ public class QuotationRestControllerTest {
         resultActions.andExpect(jsonPath("$.success").value("false"));
     }
 
-    @DisplayName("PUT /api/quotations/{quotationId}?chatId={chatId} : fail, 다른 플래너의 견적서 수정 요청")
+    @DisplayName("PUT /api/quotation/{quotationId}?chatId={chatId} : fail, 다른 플래너의 견적서 수정 요청")
     @Test
     void put_quotationUpdate_fail_permissionDenied() throws Exception {
         // given
@@ -554,7 +556,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .put("/api/quotations/" + quotationId)
+                        .put("/api/quotation/" + quotationId)
                         .header("Authorization", plannerToken)
                         .param("chatId", String.valueOf(chatId))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -575,7 +577,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .delete("/api/quotations/" + quotationId)
+                        .delete("/api/quotation/" + quotationId)
                         .header("Authorization", plannerToken)
         );
 
@@ -592,7 +594,7 @@ public class QuotationRestControllerTest {
         // when
         ResultActions resultActions = mvc.perform(
                 MockMvcRequestBuilders
-                        .delete("/api/quotations/" + quotationId)
+                        .delete("/api/quotation/" + quotationId)
                         .header("Authorization", plannerToken)
         );
 

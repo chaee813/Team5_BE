@@ -38,7 +38,9 @@ import java.util.List;
 @TestPropertySource(properties = {
         "security.jwt-config.secret.access=your-test-access-secret",
         "security.jwt-config.secret.refresh=your-test-refresh-secret",
-        "payment.toss.secret=your-test-toss-payment-secret"
+        "payment.toss.secret=your-test-toss-payment-secret",
+        "email.username=test@email.com",
+        "email.password=qweasdzxc"
 })
 @EnableWebMvc
 @SpringBootTest
@@ -65,7 +67,7 @@ public class PortfolioControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/portfolios")
+                        .post("/api/portfolio")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );
@@ -87,7 +89,7 @@ public class PortfolioControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/portfolios")
+                        .post("/api/portfolio")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );
@@ -110,7 +112,7 @@ public class PortfolioControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/portfolios")
+                        .post("/api/portfolio")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );
@@ -133,7 +135,7 @@ public class PortfolioControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/portfolios")
+                        .post("/api/portfolio")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );
@@ -156,7 +158,7 @@ public class PortfolioControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/api/portfolios?cursor="+ cursor)
+                        .get("/api/portfolio?cursor="+ cursor)
         );
 
         logResult(result);
@@ -177,7 +179,7 @@ public class PortfolioControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/api/portfolios?cursor={nextCursor}", nextCursor)
+                        .get("/api/portfolio?cursor={nextCursor}", nextCursor)
         );
 
         logResult(result);
@@ -199,7 +201,7 @@ public class PortfolioControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/api/portfolios/{id}", id)
+                        .get("/api/portfolio/{id}", id)
         );
 
         logResult(result);
@@ -223,7 +225,7 @@ public class PortfolioControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/api/portfolios/{id}", id)
+                        .get("/api/portfolio/{id}", id)
         );
 
         logResult(result);
@@ -247,7 +249,7 @@ public class PortfolioControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/api/portfolios/{id}", id)
+                        .get("/api/portfolio/{id}", id)
         );
 
         logResult(result);
@@ -267,7 +269,7 @@ public class PortfolioControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .get("/api/portfolios/{id}", id)
+                        .get("/api/portfolio/{id}", id)
         );
 
         logResult(result);
@@ -289,7 +291,7 @@ public class PortfolioControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .put("/api/portfolios")
+                        .put("/api/portfolio")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );
@@ -310,7 +312,7 @@ public class PortfolioControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .put("/api/portfolios")
+                        .put("/api/portfolio")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );
@@ -333,7 +335,7 @@ public class PortfolioControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .put("/api/portfolios")
+                        .put("/api/portfolio")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );
@@ -357,7 +359,7 @@ public class PortfolioControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .put("/api/portfolios")
+                        .put("/api/portfolio")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
         );
@@ -380,7 +382,7 @@ public class PortfolioControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .delete("/api/portfolios")
+                        .delete("/api/portfolio")
         );
 
         logResult(result);
@@ -396,7 +398,7 @@ public class PortfolioControllerTest {
         // when
         ResultActions result = mockMvc.perform(
                 MockMvcRequestBuilders
-                        .delete("/api/portfolios")
+                        .delete("/api/portfolio")
         );
 
         logResult(result);

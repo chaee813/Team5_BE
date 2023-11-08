@@ -26,7 +26,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @TestPropertySource(properties = {
         "security.jwt-config.secret.access=your-test-access-secret",
         "security.jwt-config.secret.refresh=your-test-refresh-secret",
-        "payment.toss.secret=your-test-toss-payment-secret"
+        "payment.toss.secret=your-test-toss-payment-secret",
+        "email.username=test@email.com",
+        "email.password=qweasdzxc"
 })
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -48,7 +50,7 @@ public class MatchRestControllerTest {
         //when
         ResultActions result = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/match/confirmAll?chatId=" + chatId)
+                        .post("/api/match/confirm?chatId=" + chatId)
         );
 
         logResult(result);
@@ -67,7 +69,7 @@ public class MatchRestControllerTest {
         //when
         ResultActions result = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/match/confirmAll?chatId=" + chatId)
+                        .post("/api/match/confirm?chatId=" + chatId)
         );
 
         logResult(result);
@@ -88,7 +90,7 @@ public class MatchRestControllerTest {
         //when
         ResultActions result = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/match/confirmAll?chatId=" + chatId)
+                        .post("/api/match/confirm?chatId=" + chatId)
         );
 
         logResult(result);
@@ -109,7 +111,7 @@ public class MatchRestControllerTest {
         //when
         ResultActions result = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/match/confirmAll?chatId=" + chatId)
+                        .post("/api/match/confirm?chatId=" + chatId)
         );
 
         logResult(result);
@@ -130,7 +132,7 @@ public class MatchRestControllerTest {
         //when
         ResultActions result = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/match/confirmAll?chatId=" + chatId)
+                        .post("/api/match/confirm?chatId=" + chatId)
         );
 
         logResult(result);
@@ -149,7 +151,7 @@ public class MatchRestControllerTest {
         //when
         ResultActions result = mvc.perform(
                 MockMvcRequestBuilders
-                        .get("/api/match/reviews")
+                        .get("/api/match/review")
         );
 
         logResult(result);

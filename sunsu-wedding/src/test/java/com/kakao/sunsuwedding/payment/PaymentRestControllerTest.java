@@ -29,7 +29,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @TestPropertySource(properties = {
         "security.jwt-config.secret.access=your-test-access-secret",
         "security.jwt-config.secret.refresh=your-test-refresh-secret",
-        "payment.toss.secret=your-test-toss-payment-secret"
+        "payment.toss.secret=your-test-toss-payment-secret",
+        "email.username=test@email.com",
+        "email.password=qweasdzxc"
 })
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class PaymentRestControllerTest {
@@ -54,7 +56,7 @@ public class PaymentRestControllerTest {
         // when
         ResultActions result = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/payments/save")
+                        .post("/api/payment/save")
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON)
         );
@@ -76,7 +78,7 @@ public class PaymentRestControllerTest {
         // when
         ResultActions result = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/payments/save")
+                        .post("/api/payment/save")
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON)
         );
@@ -102,7 +104,7 @@ public class PaymentRestControllerTest {
         // when
         ResultActions result = mvc.perform(
                 MockMvcRequestBuilders
-                        .post("/api/payments/approve")
+                        .post("/api/payment/approve")
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON)
         );

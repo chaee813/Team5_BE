@@ -14,18 +14,18 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/match")
 public class MatchRestController {
 
-    private final MatchService matchService;
+    private final MatchServiceImpl matchServiceImpl;
 
-    @PostMapping("/confirmAll")
-    public ResponseEntity<?> confirmAll(@AuthenticationPrincipal CustomUserDetails userDetails,
+    @PostMapping("/confirm")
+    public ResponseEntity<?> confirm(@AuthenticationPrincipal CustomUserDetails userDetails,
                                         @RequestParam @Min(1) Long chatId) {
-        matchService.confirmAll(userDetails.getUser(), chatId);
+        matchServiceImpl.confirm(userDetails.getUser(), chatId);
         return ResponseEntity.ok().body(ApiUtils.success(null));
     }
 
-    @GetMapping("/reviews")
+    @GetMapping("/review")
     public ResponseEntity<?> findMatchesWithNoReview(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        MatchResponse.FindAllWithNoReviewDTO response = matchService.findMatchesWithNoReview(userDetails.getUser());
+        MatchResponse.FindAllWithNoReviewDTO response = matchServiceImpl.findMatchesWithNoReview(userDetails.getUser());
         return ResponseEntity.ok().body(ApiUtils.success(response));
     }
 
