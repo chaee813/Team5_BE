@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
         userDataChecker.sameCheckEmail(requestDTO.email());
         userDataChecker.sameCheckPassword(requestDTO.password(), requestDTO.password2());
 
-        checkEmailAuthenticated(requestDTO);
+        //checkEmailAuthenticated(requestDTO);
 
         Role role = Role.valueOfRole(requestDTO.role());
         String encodedPassword = passwordEncoder.encode(requestDTO.password());
