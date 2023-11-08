@@ -12,6 +12,7 @@ spec:
     - http:
         paths:
           - backend:
-              serviceName: backend
-              servicePort: 8080
-              path: /(/|$)(.*)
+              serviceName: frontend
+              servicePort: 3000
+              path: /
+              pathType: Prefix
