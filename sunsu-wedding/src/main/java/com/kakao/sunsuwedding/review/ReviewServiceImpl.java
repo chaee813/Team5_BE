@@ -44,9 +44,12 @@ public class ReviewServiceImpl implements ReviewService {
     public void addReview(User user, Long chatId, ReviewRequest.AddDTO request) {
         Match match = findMatchByChatId(chatId);
 
-        roleCheck(user.getDtype()); // 예비부부이며
-        permissionCheck(user.getId(), match); //본인의 매칭이 맞는지 확인
-        matchConfirmedCheck(match); // 리뷰 작성 가능한 상태인지 확인
+        // 본인의 매칭이 맞는지 확인
+        permissionCheck(user.getId(), match);
+        // 전체 확정된 매칭인지 확인
+        matchConfirmedCheck(match);
+        // 이전에 review 작성있는지 확인
+        reviewExistCheck(match);
 
         Review review = Review.builder()
                 .match(match)
@@ -75,7 +78,6 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     public ReviewResponse.FindAllByCoupleDTO findReviewsByCouple(User user) {
-        roleCheck(user.getDtype());
 
         List<Review> reviews = reviewJPARepository.findAllByMatchCoupleId(user.getId());
         List<String> images = reviewImageItemJPARepository.findByCoupleId(user.getId());
@@ -86,11 +88,11 @@ public class ReviewServiceImpl implements ReviewService {
     public ReviewResponse.ReviewDTO findReviewById(User user, Long reviewId) {
         Review review = findReviewById(reviewId);
 
-        roleCheck(user.getDtype());
         permissionCheck(user.getId(),review.getMatch());
 
-        String plannerName = (review.getMatch().getPlanner() != null ) ? review.getMatch().getPlanner().getUsername() : "탈퇴한 사용자";
-        String coupleName = (review.getMatch().getCouple() != null ) ? review.getMatch().getCouple().getUsername() : "탈퇴한 사용자";
+        String plannerName = getNameByUser(review.getMatch().getPlanner());
+        String coupleName = getNameByUser(review.match.getCouple());
+
         Optional<Portfolio> portfolio = portfolioJPARepository.findByPlanner(review.getMatch().getPlanner());
         Long portfolioId = portfolio.isPresent() ? portfolio.get().getId() : -1L;
 
@@ -103,7 +105,6 @@ public class ReviewServiceImpl implements ReviewService {
     public void updateReview(User user, Long reviewId, ReviewRequest.UpdateDTO request) {
         Review review = findReviewById(reviewId);
 
-        roleCheck(user.getDtype());
         permissionCheck(user.getId(), review.getMatch());
 
         review.updateReview(request);
@@ -122,7 +123,6 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = findReviewById(reviewId);
         Match match = review.getMatch();
 
-        roleCheck(user.getDtype());
         permissionCheck(user.getId(), review.getMatch());
 
         reviewJPARepository.delete(review);
@@ -150,12 +150,6 @@ public class ReviewServiceImpl implements ReviewService {
         );
     }
 
-    private void roleCheck(String role) {
-        if (role.equals(Role.PLANNER.getRoleName())) {
-            throw new ForbiddenException(BaseException.PERMISSION_DENIED_METHOD_ACCESS);
-        }
-    }
-
     private void permissionCheck(Long userId, Match match) {
         if (!match.getCouple().getId().equals(userId)) {
             throw new ForbiddenException(BaseException.PERMISSION_DENIED_METHOD_ACCESS);
@@ -168,14 +162,25 @@ public class ReviewServiceImpl implements ReviewService {
         }
     }
 
+    private void reviewExistCheck(Match match){
+        if (match.getReviewStatus().equals(ReviewStatus.WRITTEN)){
+            throw new BadRequestException(BaseException.REVIEW_EXIST);
+        }
+    }
+
     private void updateReviewStatus(Match match){
         if (match.getReviewStatus().equals(ReviewStatus.UNWRITTEN)) {
             match.updateReviewStatus(ReviewStatus.WRITTEN);
             matchJPARepository.save(match);
         }
-        else {
-            match.updateReviewStatus(ReviewStatus.UNWRITTEN);
-            matchJPARepository.save(match);
+        match.updateReviewStatus(ReviewStatus.UNWRITTEN);
+        matchJPARepository.save(match);
+    }
+
+    private static String getNameByUser(User user) {
+        if (user == null) {
+            return "탈퇴한 사용자";
         }
+        return user.getUsername();
     }
 }

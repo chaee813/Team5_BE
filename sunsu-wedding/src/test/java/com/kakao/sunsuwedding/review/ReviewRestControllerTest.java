@@ -53,6 +53,32 @@ public class ReviewRestControllerTest {
     @WithUserDetails("couple@gmail.com")
     public void add_review_success_test() throws Exception {
         // given
+        Long chatId = 6L;
+        List<String> images = List.of("/wAA", "/wAA");
+        ReviewRequest.AddDTO request = new ReviewRequest.AddDTO(4, "최고의 플래너!", images);
+
+        String requestBody = om.writeValueAsString(request);
+
+        // when
+        ResultActions result = mockMvc.perform(
+                MockMvcRequestBuilders
+                        .post("/api/review")
+                        .param("chatId", String.valueOf(chatId))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
+        );
+
+        logResult(result);
+
+        // then
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.success").value("true"));
+    }
+
+    @DisplayName("리뷰 등록 실패 테스트0 - 이미 리뷰가 존재하는 채팅방")
+    @Test
+    @WithUserDetails("couple@gmail.com")
+    public void add_review_fail_test_exist_review() throws Exception {
+        // given
         Long chatId = 1L;
         List<String> images = List.of("/wAA", "/wAA");
         ReviewRequest.AddDTO request = new ReviewRequest.AddDTO(5, "최고의 플래너!", images);
@@ -71,7 +97,7 @@ public class ReviewRestControllerTest {
         logResult(result);
 
         // then
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.success").value("true"));
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.success").value("false"));
     }
 
     @DisplayName("리뷰 등록 실패 테스트 1 - 존재하지 않는 채팅방")
@@ -98,7 +124,7 @@ public class ReviewRestControllerTest {
 
         // then
         result.andExpect(MockMvcResultMatchers.jsonPath("$.success").value("false"));
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.error.status").value(404));
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.error.status").value(5001));
         result.andExpect(MockMvcResultMatchers.jsonPath("$.error.message").value("매칭 내역을 찾을 수 없습니다."));
     }
 
@@ -126,7 +152,7 @@ public class ReviewRestControllerTest {
 
         // then
         result.andExpect(MockMvcResultMatchers.jsonPath("$.success").value("false"));
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.error.status").value(403));
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.error.status").value(1000));
         result.andExpect(MockMvcResultMatchers.jsonPath("$.error.message").value("사용할 수 없는 기능입니다."));
     }
 
@@ -154,7 +180,7 @@ public class ReviewRestControllerTest {
 
         // then
         result.andExpect(MockMvcResultMatchers.jsonPath("$.success").value("false"));
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.error.status").value(400));
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.error.status").value(5003));
         result.andExpect(MockMvcResultMatchers.jsonPath("$.error.message").value("견적서 전체 확정이 되지 않았습니다."));
     }
 
@@ -317,7 +343,7 @@ public class ReviewRestControllerTest {
         // then
         result.andExpect(MockMvcResultMatchers.jsonPath("$.success").value("false"));
         result.andExpect(MockMvcResultMatchers.jsonPath("$.error.message").value("해당 리뷰가 삭제되었거나 존재하지 않습니다."));
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.error.status").value(404));
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.error.status").value(7001));
 
     }
 
@@ -345,7 +371,7 @@ public class ReviewRestControllerTest {
         // then
         result.andExpect(MockMvcResultMatchers.jsonPath("$.success").value("false"));
         result.andExpect(MockMvcResultMatchers.jsonPath("$.error.message").value("사용할 수 없는 기능입니다."));
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.error.status").value(403));
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.error.status").value(1000));
 
     }
 
@@ -389,7 +415,7 @@ public class ReviewRestControllerTest {
         // then
         result.andExpect(MockMvcResultMatchers.jsonPath("$.success").value("false"));
         result.andExpect(MockMvcResultMatchers.jsonPath("$.error.message").value("해당 리뷰가 삭제되었거나 존재하지 않습니다."));
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.error.status").value(404));
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.error.status").value(7001));
 
     }
 
@@ -411,7 +437,7 @@ public class ReviewRestControllerTest {
         // then
         result.andExpect(MockMvcResultMatchers.jsonPath("$.success").value("false"));
         result.andExpect(MockMvcResultMatchers.jsonPath("$.error.message").value("사용할 수 없는 기능입니다."));
-        result.andExpect(MockMvcResultMatchers.jsonPath("$.error.status").value(403));
+        result.andExpect(MockMvcResultMatchers.jsonPath("$.error.status").value(1000));
     }
 
     private void logResult(ResultActions result) throws Exception {
