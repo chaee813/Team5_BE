@@ -142,6 +142,7 @@ public class SecurityConfig {
 
         configuration.addAllowedOriginPattern("http://localhost:8080/**");
         configuration.addAllowedOriginPattern("http://localhost:3000/**");
+        configuration.addAllowedOriginPattern("http://127.0.0.1:3000/**");
         configuration.addAllowedOriginPattern("https://k6f3d3b1a0696a.user-app.krampoline.com/**");
 
         configuration.setAllowCredentials(true);
