@@ -80,17 +80,9 @@ public class PaymentServiceImpl implements PaymentService {
         parameters.put("orderId", requestDTO.orderId());
         parameters.put("amount", requestDTO.amount().toString());
 
-        HttpClient httpClient = HttpClient.create()
-                .proxy(it ->
-                        it.type(ProxyProvider.Proxy.HTTP)
-                                .host("http://krmp-proxy.9rum.cc")
-                                .port(312)
-                );
-
         WebClient webClient =
                 WebClient
                         .builder()
-                        .clientConnector(new ReactorClientHttpConnector(httpClient))
                         .baseUrl("https://api.tosspayments.com")
                         .build();
 
