@@ -17,6 +17,9 @@ import java.time.LocalDateTime;
         name="user_tb",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = {"id", "email", "is_active"})
+        },
+        indexes = {
+                @Index(name = "email_index", columnList = "email")
         })
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dtype")
@@ -31,13 +34,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 100, nullable = false)
+    @Column(nullable = false)
     private String email;
 
-    @Column(length = 256, nullable = false)
+    @Column(nullable = false)
     private String password;
 
-    @Column(length = 45, nullable = false)
+    @Column(nullable = false)
     private String username;
 
     @Column(nullable = false)

@@ -7,12 +7,17 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "portfolio_tb")
+@Table(
+        name = "portfolio_tb",
+        indexes = {
+                @Index(name = "planner_index", columnList = "planner_id")
+        })
 @SQLDelete(sql = "UPDATE portfolio_tb SET is_active = false WHERE id = ?")
 @Where(clause = "is_active = true")
 @Getter
@@ -31,16 +36,16 @@ public class Portfolio {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String description;
 
     @Column(nullable = false)
     private String location;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String career;
 
-    @Column(name = "partner_company", nullable = false)
+    @Column(name = "partner_company", nullable = false, length = 1000)
     private String partnerCompany;
 
     @Column(name = "total_price")
