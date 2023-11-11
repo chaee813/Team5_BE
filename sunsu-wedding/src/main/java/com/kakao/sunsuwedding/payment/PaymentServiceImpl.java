@@ -9,12 +9,17 @@ import com.kakao.sunsuwedding.user.base_user.UserJPARepository;
 import com.kakao.sunsuwedding.user.constant.Grade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.*;
 
 @Service
@@ -73,29 +78,26 @@ public class PaymentServiceImpl implements PaymentService {
 
     private void tossPayApprove(PaymentRequest.ApproveDTO requestDTO){
         // 토스페이먼츠 승인 api 요청
-        String basicToken = "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes());
+        String basicToken = Base64.getEncoder().encodeToString((secretKey + ":").getBytes());
 
-        WebClient webClient =
-                WebClient
-                        .builder()
-                        .baseUrl("https://api.tosspayments.com")
-                        .build();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBasicAuth(basicToken);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
-        TossPaymentResponse.TosspayDTO result =
-                webClient
-                        .post()
-                        .uri("/v1/payments/confirm")
-                        .headers(headers -> {
-                            headers.add(HttpHeaders.AUTHORIZATION, basicToken);
-                            headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-                        })
-                        .bodyValue(requestDTO)
-                        .retrieve()
-                        .bodyToMono(TossPaymentResponse.TosspayDTO.class)
-                        .onErrorResume(e -> {
-                            throw new ServerException(BaseException.PAYMENT_FAIL);
-                        })
-                        .block();
+        Proxy proxy = new Proxy(java.net.Proxy.Type.HTTP,
+                new InetSocketAddress("krmp-proxy.9rum.cc",3128));
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setProxy(proxy);
+        RestTemplate restTemplate = new RestTemplate(factory);
+
+        try {
+            restTemplate.postForEntity("https://api.tosspayments.com/v1/payments/confirm",
+                    new HttpEntity<>(requestDTO, headers),
+                    String.class);
+        } catch (Exception e) {
+            throw new ServerException(BaseException.PAYMENT_FAIL);
+        }
     }
 
     // 받아온 payment와 관련된 데이터(orderId, amount)가 정확한지 확인)
