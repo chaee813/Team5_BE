@@ -17,7 +17,7 @@ import java.util.Date;
 @Component
 public class JWTProvider {
     // access-token expire time = 15 min
-    public final Long ACCESS_TOKEN_EXP = 1000L * 60 * 15;
+    public final Long ACCESS_TOKEN_EXP = 1000L * 60 * 30; // 임시로 30분
     // refresh-token expire time = 3 days
     public final Long REFRESH_TOKEN_EXP = 1000L * 60 * 60 * 24 * 3;
     public final String TOKEN_PREFIX = "Bearer ";
